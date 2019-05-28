@@ -5,6 +5,22 @@ const fileSystem = require('fs');
 const chalk = require('chalk');
 const { Transform } = require('stream');
 
+const transform = (chunk, encoding, callback) => {
+  const currentPieces = (firstLineEnd ? chunk.toString().substr(firstLineEnd + 1) : chunk.toString()).split('\r\n');
+
+  currentPieces.forEach(piece => {
+    const obj = {};
+    const values = piece.split(',');
+
+    structureKeys.forEach((key, index) => {
+      obj[key] = values[index];
+    });
+    this.push(`${firstLineEnd ? '' : ','}\r\n${JSON.stringify(obj)}`);
+    firstLineEnd = null;
+  });
+  callback();
+}
+
 if (constants.requiredArgs.every(argument => args.includes(argument))) {
   const sourceFileArgIndex = args.findIndex(argument => argument === constants.requiredArgs[0]);
   const resultFileArgIndex = args.findIndex(argument => argument === constants.requiredArgs[1]);
@@ -22,25 +38,9 @@ if (constants.requiredArgs.every(argument => args.includes(argument))) {
     } else {
       const srcStream = fileSystem.createReadStream(sourceFile);
       const distStream = fileSystem.createWriteStream(resultFile);
+      const transformStream = new Transform({transform});
       let structureKeys;
       let firstLineEnd;
-      const transformStream = new Transform({
-        transform(chunk, encoding, callback) {
-          const currentPieces = (firstLineEnd ? chunk.toString().substr(firstLineEnd + 1) : chunk.toString()).split('\r\n');
-
-          currentPieces.forEach(piece => {
-            const obj = {};
-            const values = piece.split(',');
-
-            structureKeys.forEach((key, index) => {
-              obj[key] = values[index];
-            });
-            this.push(`${firstLineEnd ? '' : ','}\r\n${JSON.stringify(obj)}`);
-            firstLineEnd = null;
-          });
-          callback();
-        }
-      })
 
       distStream.write('[');
       srcStream.on('error', err => console.log(chalk.red(`File ${sourceFile} is not exists!`)));
