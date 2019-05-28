@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/lebeduhaa/csv-to-json/issues"
   },
-  "homepage": "https://github.com/lebeduhaa/csv-to-json#readme"
+  "homepage": "https://github.com/lebeduhaa/csv-to-json#readme",
+  "dependencies": {
+    "chalk": "^2.4.2"
+  }
 }
