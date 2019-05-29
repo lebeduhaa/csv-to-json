@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "direct-mason-242113",
+  "private_key_id": "3fba41c9d5629360f1f2fc16e986d88e2ef312ab",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC7unihh95ihw1j\nkzqkjXEBPxLLgLpq3Wk5vV0S+eczPLFRIQ8KQdAeC8B4WPLoU33EgZnUBBXBwpjK\nNXzPb/3XaYnqw1iimZbwmSFTw0vVxuLA0kW7doMhQ1fqq/oY4rwJC6BIvJOHWgDn\n6Pog33OWu/0tAowZUVQ5cZp8VUw7JcXpOrwxrTeZQBskQ2NuQppEeY6SdqKM/Pcl\nTnsheGVgMS7v85T5mWF63h8sdf00XSuYTHsNeSsGY6fKVLTjC8HpETfJETtqf1jJ\ncrk8gppZSSTslD314N7OomRGVX+6xrY4I/o6WSNiwwwTKWg6cN1Fnue+gLG9fUb4\nREplT1xvAgMBAAECggEAC7UCRtiJRs2zSQ1qb86eSHydeHFrrrRmFoK3pjJNd8WG\nLVAJdxNJnkYPV7H8W/6w7itC45Tpom63Roz1Xp5WTzO2tRw/j8xSPGjgSi/4r7k6\ndNnoHVuzq8ReXDUjYJ/rKAlAkqin7p3vRoch6iDlPXY1wLPS9tU6kmaCQtSy71E9\nWVoTiHVKinj6kQfnIzH4hpgGmFildpQP84CFb5/lUVtC4YzyyyqXo2/3Lr0c8OMP\noMLb9mSOGeccWZgv208Dp0FiMKZN0nQzvD2kIr+es/JpMvX0yLIzHRYLNWsobFeq\nQOWzeb/UZ69+j4EJknKkc1j4++0ZPWNe3j/CRNqsAQKBgQDmLXGMjkB6vtghxWjJ\nv1eD2PQ2gXNmBTeUBeHhwnFeePaeC0cMQ6BEoKJWxImM3WUDK2laTDQDiYhtMKv/\nRrKGZoWpjYWdRyo4CAjjVhcZmT8DaVRBcn4MGOZXTzUIGCw14YK/uhivuQSUC5AZ\nQeTTdt5JrRHaVWeNuBqyRXgybwKBgQDQyepUH2VIrNYGpis0VFZnP/QDS2Az3043\nnewyIp+9ugfglIIrX6JfLxHW5M30UTTiWE/CSBi2lgX+nKHKgCtyXRXk68bX57My\npGN8TcmObqqJZ74HfyCwjfMnPoLBdB7xTSyi88yQAXFovwbraMe9A7ejtjo3Jibe\ny13dPOh2AQKBgQDiXszuY7RMQ0aCKAh/aVujQooi1LruGbFoNUTJ55XhSGuaURMF\nn7iN5cDiPpXcYJwIOvh4orsAw5DVeemdvCS1Azzu3E0MucFuq5A6LB+5wDn1m/AO\nEZCfSxm1wiMwm71XHDqfXmEK6JX1F04XWPO3eI7yvG/zXszh1q8CpkmopwKBgQCD\nLdmkcPVZ6/2sv8p1XmfLB0twpnMTJEIof3hfJ5HlynQYjjYaukNyOkijE66yyjLH\n42R5VILydN/fUNn2OQETIZkX82tDS7gzIUXAW78/VhifrCag3ybSxtz20zekBClM\nwohA+ZyU/dMbVKosTfDwuN0wZtW8wKO7Z1raHeKQAQKBgGHux8r+dsq0jdT17i2O\nbmXsbOuMbORt3EDgLqxvHXclAqSSkLkmgjvs3gWeqtJTwocxngeJTY0n2ApYzJDx\nPzNFJER48kK/5bQG4Swcne4OBgX1pqL/bHnWFmiAtN0W1wxiM1juHIrwmjcqqpD1\njvhjBU1K2YQAKQolR8wrcvDS\n-----END PRIVATE KEY-----\n",
+  "client_email": "testgoogledriveapi@direct-mason-242113.iam.gserviceaccount.com",
+  "client_id": "109619177964825452631",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/testgoogledriveapi%40direct-mason-242113.iam.gserviceaccount.com"
+}
