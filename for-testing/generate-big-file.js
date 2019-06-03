@@ -1,38 +1,46 @@
-const fs = require('fs');
-const readLine = require('readline');
+const readline = require('readline');
+const fileSystem = require('fs');
 const chalk = require('chalk');
-
-const r = readLine.createInterface({
-    input: process.stdin,
-    output: process.stdout
+const events = require('events');
+const constants = require('../app/constants');
+const reader = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
 });
+let numberOfCopyPasting = 0;
+const finishEvent = new events.EventEmitter();
 
-const createBigFile = (fileName) => {
-    const stream = fs.createWriteStream(`${__dirname}/${fileName}.csv`);
+const runDataTransfer = (filename) => {
+    const source = fileSystem.createReadStream(`${__dirname}\\test.csv`);
+    const dist = fileSystem.createWriteStream(`${__dirname}\\${filename}.csv`, {flags: 'a'});
 
-    stream.write('name|heightmass|hair_color|eye_color|gender\n');
-    console.log(chalk.yellow('Start of the file creating...'));
-
-    for (let i = 0; i < 7000000; i++) {
-        stream.write(`Luke Skywalker!172!77!blond!blue!male
-C-3PO!167!75!n|a!yellow!n|a
-R2-D2!96!32!n|a!red!n|a
-Darth Vader!202!136!none!yellow!male
-Leia Organa!150!49!brown!brown!female
-`);
-    }
-
-    console.log(chalk.green(`File ${fileName}.csv was created successfully`));
+    source.pipe(dist);
+    source.on('close', () => {
+        if (numberOfCopyPasting === constants.generateTest.numberOfIteration) {
+            finishEvent.emit('finish');
+        } else {
+            numberOfCopyPasting++;
+            runDataTransfer(filename);
+            dist.close();
+        }
+    });
 };
 
+const createBigFile = async filename => new Promise((resolve) => {
+    runDataTransfer(filename);
+    finishEvent.on('finish', () => resolve());
+});
+
 const readFileName = () => {
-    r.question('Input name of the big file :  ', (fileName) => {
-        if (fs.existsSync(`${__dirname}|${fileName}.csv`)) {
-            console.log(chalk.red(`File ${fileName}.csv is already exists!`));
+    reader.question('Input name of the big file :  ', async (filename) => {
+        if (fileSystem.existsSync(`${__dirname}\\${filename}.csv`)) {
+            console.log(chalk.red(`File ${filename}.csv is already exists!`));
             readFileName();
         } else {
-            r.close();
-            createBigFile(fileName);
+            reader.close();
+            console.log(chalk.yellow('Starting file creation...'));
+            await createBigFile(filename);
+            console.log(chalk.green(`File ${filename}.csv was created successfully!`));
         }
     });
 };

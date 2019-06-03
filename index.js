@@ -3,53 +3,18 @@ const args = process.argv.slice(2);
 const fileSystem = require('fs');
 const chalk = require('chalk');
 const { Transform } = require('stream');
-const { uploadFile } = require('./google-drive/google-drive-api');
-const constants = require('./app-constants');
+const { uploadFile, authorizeGoogleDrive } = require('./google-drive/google-drive-api');
+const constants = require('./app/constants');
+const { getSeparator } = require('./app/separator');
 
-
-const getSeparator = (data) => {
-    if (args.length > constants.minLengthOfArguments) {
-        if (!args.includes(constants.optionalArgs.separator)) {
-            console.log(chalk.red('Incorrect syntax of the command!'));
-            process.exit(1);
-        } else {
-            return args[args.findIndex(argument => argument === constants.optionalArgs.separator) + 1];
-        }
-    } else {
-        let maxSeparator = {
-            separator: constants.potentialSeparators[0],
-            value: 0
-        };
-
-        constants.potentialSeparators.forEach((potentialSeparator) => {  
-            let count = 0;
-
-            for (let i = 0; i < data.length; i++) {
-                if (data[i] === potentialSeparator && data[i - 1] !== potentialSeparator) {
-                    count++;
-                }
-            }
-
-            if (count > maxSeparator.value) {
-                maxSeparator = {
-                    separator: potentialSeparator,
-                    value: count
-                };
-            }
-        });
-
-        return maxSeparator.separator;
-    }
-};
-
-if (constants.requiredArgs.every(argument => args.includes(argument))) {
-    const sourceFileArgIndex = args.findIndex(argument => argument === constants.requiredArgs[0]);
-    const resultFileArgIndex = args.findIndex(argument => argument === constants.requiredArgs[1]);
+if (constants.args.requiredArgs.every(argument => args.includes(argument))) {
+    const sourceFileArgIndex = args.findIndex(argument => argument === constants.args.requiredArgs[0]);
+    const resultFileArgIndex = args.findIndex(argument => argument === constants.args.requiredArgs[1]);
 
     if (
-        constants.argValiIndexes.includes(sourceFileArgIndex) &&
-        constants.argValiIndexes.includes(resultFileArgIndex) &&
-        args.length >= constants.minLengthOfArguments
+        constants.args.argValiIndexes.includes(sourceFileArgIndex) &&
+        constants.args.argValiIndexes.includes(resultFileArgIndex) &&
+        args.length >= constants.args.minLengthOfArguments
     ) {
         const sourceFile = args[sourceFileArgIndex + 1];
         const resultFile = args[resultFileArgIndex + 1];
@@ -104,10 +69,17 @@ if (constants.requiredArgs.every(argument => args.includes(argument))) {
             srcStream.on('close', () => {
                 const mainStream = fileSystem.createReadStream(sourceFile).pipe(transformStream).pipe(distStream);
 
-                mainStream.on('finish', () => {
-                    fileSystem.createWriteStream(resultFile, { flags: 'a' }).write(']');
+                mainStream.on('finish', async () => {
+                    const finishStream = fileSystem.createWriteStream(resultFile, { flags: 'a' });
+
+                    finishStream.write(']');
+                    finishStream.close();
+                    distStream.close();
                     console.log(chalk.green('Converting was performed successfully!'));
-                    uploadFile(resultFile);
+                    await authorizeGoogleDrive();
+                    await uploadFile(resultFile);
+                    console.log(chalk.bgGreen(`Result was saved on Google Drive as ${resultFile}.`));
+                    console.log(chalk.green('Go to https://drive.google.com/drive/folders/1VeKxiwl93buBrcaaB7zhCGMnSGfiHyP7 to open this file'));
                 });
             });
         }

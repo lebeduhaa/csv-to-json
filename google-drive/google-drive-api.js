@@ -1,32 +1,36 @@
 const { google } = require('googleapis');
-
 const drive = google.drive('v3');
 const fs = require('fs');
-const chalk = require('chalk');
 const key = require('./private_key.json');
+const constants = require('../app/constants');
+let jwToken;
 
-const jwToken = new google.auth.JWT(
-    key.client_email,
-    null,
-    key.private_key,
-    ['https://www.googleapis.com/auth/drive'],
-    null
-);
-jwToken.authorize((authErr) => {
-    if (authErr) {
-        console.log(`err : ${authErr}`);
-        return;
-    }
+
+const authorizeGoogleDrive = () => new Promise((resolve, reject) => {
+    jwToken = new google.auth.JWT(
+        key.client_email,
+        null,
+        key.private_key,
+        [constants.googleDrive.scopes.authDrive],
+        null
+    );
+    jwToken.authorize((err) => {
+        if (err) {
+            reject(err);
+        } else {
+            resolve();
+        }
+    });
 });
 
-const uploadFile = (fileName) => {
-    const folderId = '1VeKxiwl93buBrcaaB7zhCGMnSGfiHyP7';
+const uploadFile = fileName => new Promise((resolve, reject) => {
+    const { folderId } = constants.googleDrive;
     const fileMetadata = {
         name: fileName,
         parents: [folderId]
     };
     const media = {
-        mimeType: 'tapplication/json',
+        mimeType: constants.googleDrive.mimeType,
         body: fs.createReadStream(fileName)
     };
 
@@ -34,15 +38,15 @@ const uploadFile = (fileName) => {
         auth: jwToken,
         resource: fileMetadata,
         media,
-        fields: 'id'
-    }, (err, file) => {
+        fields: constants.googleDrive.fields
+    }, (err) => {
         if (err) {
-            console.error(err);
+            reject(err);
         } else {
-            console.log(chalk.bgGreen(`Result was saved on Google Drive as ${fileName}.`));
-            console.log(chalk.green('Go to https://drive.google.com/drive/folders/1VeKxiwl93buBrcaaB7zhCGMnSGfiHyP7 to open this file'))
+            resolve();
         }
     });
-};
+});
 
 exports.uploadFile = uploadFile;
+exports.authorizeGoogleDrive = authorizeGoogleDrive;
