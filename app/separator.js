@@ -1,43 +1,54 @@
 const args = process.argv.slice(2);
 const constants = require('../app/constants');
 
-const getSeparator = (data) => {
-  if (args.length > constants.args.minLengthOfArguments) {
-      if (!args.includes(constants.args.optionalArgs.separator)) {
-          console.log(chalk.red('Incorrect syntax of the command!'));
-          process.exit(1);
-      } else {
-          return args[args.findIndex(argument => argument === constants.args.optionalArgs.separator) + 1];
-      }
-  } else {
-      return detectSeparator(data);
-  }
-};
+class SeparatorDetector {
 
-const detectSeparator = (data) => {
-  let maxSeparator = {
-      separator: constants.potentialSeparators[0],
-      value: 0
-  };
+    static getSeparator(line) {
+        if (args.length > constants.args.minLength) {
+            if (!args.includes(constants.args.optional.separator)) {
+                console.log(chalk.red('Incorrect syntax of the command!'));
+                process.exit(1);
+            } else {
+                return args[args.findIndex(argument => argument === constants.args.optional.separator) + 1];
+            }
+        } else {
+            return this.__detectSeparator(line);
+        }
+    }
 
-  constants.potentialSeparators.forEach((potentialSeparator) => {  
-      let count = 0;
+    static __detectSeparator(line) {
+        let maxSeparator = {
+            separator: constants.potentialSeparators[0],
+            value: 0
+        };
+      
+        constants.potentialSeparators.forEach((potentialSeparator) => {  
+            let count = 0;
+      
+            for (let i = 0; i < line.length; i++) {
+                if (line[i] === potentialSeparator && line[i - 1] !== potentialSeparator) {
+                    count++;
+                }
+            }
+      
+            if (count > maxSeparator.value) {
+                maxSeparator = {
+                    separator: potentialSeparator,
+                    value: count
+                };
+            }
+        });
+      
+        return maxSeparator.separator;
+    }
 
-      for (let i = 0; i < data.length; i++) {
-          if (data[i] === potentialSeparator && data[i - 1] !== potentialSeparator) {
-              count++;
-          }
-      }
-
-      if (count > maxSeparator.value) {
-          maxSeparator = {
-              separator: potentialSeparator,
-              value: count
-          };
-      }
-  });
-
-  return maxSeparator.separator;
+    static getNextLineSeparator(line) {
+        if (~line.toString().indexOf('\r')) {
+            return '\r';
+        } else {
+            return '\n';
+        }
+    }
 }
 
-exports.getSeparator = getSeparator;
+module.exports = SeparatorDetector;

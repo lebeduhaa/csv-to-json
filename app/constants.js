@@ -1,14 +1,14 @@
 const constants = {
     args: {
-        requiredArgs: [
+        required: [
             '--sourceFile',
             '--resultFile'
         ],
-        optionalArgs: {
+        optional: {
             separator: '--separator'
         },
-        argValiIndexes: [0, 2, 4],
-        minLengthOfArguments: 4
+        valiIndexes: [0, 2, 4],
+        minLength: 4
     },
     potentialSeparators: [
         ' ', ',', '/', '\\', '|', '.', '!', '@', '#', '$', '%', '^', '&',
@@ -23,7 +23,8 @@ const constants = {
         fields: 'id'
     },
     generateTest: {
-        numberOfIteration: 13600
+        // numberOfIteration: 13600
+        numberOfIteration: 600
     }
 };
 

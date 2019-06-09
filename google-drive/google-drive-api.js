@@ -1,52 +1,70 @@
 const { google } = require('googleapis');
 const drive = google.drive('v3');
 const fs = require('fs');
-const key = require('./private_key.json');
-const constants = require('../app/constants');
 let jwToken;
 
+class GoogleDrive {
 
-const authorizeGoogleDrive = () => new Promise((resolve, reject) => {
-    jwToken = new google.auth.JWT(
-        key.client_email,
-        null,
-        key.private_key,
-        [constants.googleDrive.scopes.authDrive],
-        null
-    );
-    jwToken.authorize((err) => {
-        if (err) {
-            reject(err);
-        } else {
-            resolve();
-        }
-    });
-});
+    constructor(
+        folderId,
+        clientEmail,
+        privateKey,
+        scopes,
+        mimeType,
+        fields
+    ) {
+        this.folderId = folderId;
+        this.clientEmail = clientEmail;
+        this.privateKey = privateKey;
+        this.scopes = scopes;
+        this.mimeType = mimeType;
+        this.fields = fields;
+    }
 
-const uploadFile = fileName => new Promise((resolve, reject) => {
-    const { folderId } = constants.googleDrive;
-    const fileMetadata = {
-        name: fileName,
-        parents: [folderId]
-    };
-    const media = {
-        mimeType: constants.googleDrive.mimeType,
-        body: fs.createReadStream(fileName)
-    };
+    authorize() {
+        return new Promise((resolve, reject) => {
+            jwToken = new google.auth.JWT(
+                this.clientEmail,
+                null,
+                this.privateKey,
+                this.scopes,
+                null
+            );
+            jwToken.authorize((err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve();
+                }
+            });
+        });
+    } 
 
-    drive.files.create({
-        auth: jwToken,
-        resource: fileMetadata,
-        media,
-        fields: constants.googleDrive.fields
-    }, (err) => {
-        if (err) {
-            reject(err);
-        } else {
-            resolve();
-        }
-    });
-});
+    uploadFile(filename) {
+        return new Promise((resolve, reject) => {
+            const fileMetadata = {
+                name: filename,
+                parents: [this.folderId]
+            };
+            const media = {
+                mimeType: this.mimeType,
+                body: fs.createReadStream(filename)
+            };
+        
+            drive.files.create({
+                auth: jwToken,
+                resource: fileMetadata,
+                media,
+                fields: this.fields
+            }, (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve();
+                }
+            });
+        });
+    }
+}
 
-exports.uploadFile = uploadFile;
-exports.authorizeGoogleDrive = authorizeGoogleDrive;
+module.exports = GoogleDrive;
