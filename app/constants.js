@@ -7,7 +7,7 @@ const constants = {
         optional: {
             separator: '--separator'
         },
-        valiIndexes: [0, 2, 4],
+        validIndexes: [0, 2, 4],
         minLength: 4
     },
     potentialSeparators: [
@@ -19,7 +19,7 @@ const constants = {
             authDrive: 'https://www.googleapis.com/auth/drive'
         },
         folderId: '1VeKxiwl93buBrcaaB7zhCGMnSGfiHyP7',
-        mimeType: 'tapplication/json',
+        mimeType: 'application/json',
         fields: 'id'
     },
     generateTest: {

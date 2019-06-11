@@ -1,16 +1,16 @@
-const GoogleDrive = require('../google-drive/google-drive-api');
-const serviceAccount = require('../google-drive/private_key.json');
-const SeparatorDetector = require('./separator');
 const { Transform } = require('stream');
 const chalk = require('chalk');
 const fileSystem = require('fs');
+const GoogleDrive = require('../google-drive/google-drive-api');
+const serviceAccount = require('../google-drive/private_key.json');
+const SeparatorDetector = require('./separator');
 const constants = require('./constants');
 
 class CsvToJson {
-
-    constructor(sourceFile, resultFile) {
+    constructor(sourceFile, resultFile, separatorDetector) {
         this.sourceFile = sourceFile;
         this.resultFile = resultFile;
+        this.separatorDetector = separatorDetector;
         this.separator = null;
         this.nextLineSeparator = null;
         this.firstLineEnd = null;
@@ -21,17 +21,20 @@ class CsvToJson {
 
     run() {
         this.srcStream = fileSystem.createReadStream(this.sourceFile);
-        this.srcStream.on('error', err => console.log(chalk.red(`File ${this.sourceFile} is not exists!`)));
-        this.__defineTransformStreamOptions(this.srcStream, this.targetStream);
-        this.srcStream.on('close', this.__startProcessing());
+        this.srcStream.on('error', (err) => {
+            console.log(chalk.red(`File ${this.sourceFile} is not exists!`));
+        });
+        this._defineTransformStreamOptions(this.srcStream, this.targetStream);
+        this.srcStream.on('close', this._startProcessing());
     }
 
-    __createTransformStream() {
+    _createTransformStream() {
         const csvToJson = this;
 
         return new Transform({
             transform(chunk, encoding, callback) {
-                const currentPieces = (csvToJson.firstLineEnd ? chunk.toString().substr(csvToJson.firstLineEnd + 1) : chunk.toString()).split(csvToJson.nextLineSeparator);
+                const currentPieces = (csvToJson.firstLineEnd ? chunk.toString()
+                    .substr(csvToJson.firstLineEnd + 1) : chunk.toString()).split(csvToJson.nextLineSeparator);
 
                 currentPieces.forEach((piece) => {
                     const obj = {};
@@ -48,28 +51,33 @@ class CsvToJson {
         });
     }
 
-    __defineTransformStreamOptions() {
+    _defineTransformStreamOptions() {
         this.srcStream.on('data', (filePiece) => {
-            this.separator = SeparatorDetector.getSeparator(filePiece.toString());
+            this.separator = this.separatorDetector.getSeparator(filePiece.toString());
             this.targetStream = fileSystem.createWriteStream(this.resultFile);
             this.targetStream.write('[');
             console.log(chalk.green('The process have started...'));
 
-            this.nextLineSeparator = SeparatorDetector.getNextLineSeparator(filePiece);
-            this.firstLineEnd = filePiece.toString().indexOf(this.nextLineSeparator);
+            this.nextLineSeparator = this.separatorDetector.getNextLineSeparator(filePiece);
+            this.firstLineEnd = filePiece.toString()
+                .indexOf(this.nextLineSeparator);
 
-            if (~this.firstLineEnd) {
-                this.structureKeys = filePiece.toString().substr(0, this.firstLineEnd - 1).split(this.separator);
-                this.__defineTransformStreamOptions();
+            if (this.firstLineEnd !== -1) {
+                this.structureKeys = filePiece.toString()
+                    .substr(0, this.firstLineEnd - 1)
+                    .split(this.separator);
+                this._defineTransformStreamOptions();
                 this.srcStream.close();
             }
         });
     }
 
-    __startProcessing() {
+    _startProcessing() {
         return () => {
-            const transformStream = this.__createTransformStream();
-            const mainStream = fileSystem.createReadStream(this.sourceFile).pipe(transformStream).pipe(this.targetStream);
+            const transformStream = this._createTransformStream();
+            const mainStream = fileSystem.createReadStream(this.sourceFile)
+                .pipe(transformStream)
+                .pipe(this.targetStream);
 
             mainStream.on('finish', async () => {
                 const finishStream = fileSystem.createWriteStream(this.resultFile, { flags: 'a' });

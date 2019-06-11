@@ -1,9 +1,9 @@
 const args = process.argv.slice(2);
+const chalk = require('chalk');
 const constants = require('../app/constants');
 
 class SeparatorDetector {
-
-    static getSeparator(line) {
+    getSeparator(line) {
         if (args.length > constants.args.minLength) {
             if (!args.includes(constants.args.optional.separator)) {
                 console.log(chalk.red('Incorrect syntax of the command!'));
@@ -11,26 +11,26 @@ class SeparatorDetector {
             } else {
                 return args[args.findIndex(argument => argument === constants.args.optional.separator) + 1];
             }
-        } else {
-            return this.__detectSeparator(line);
         }
+
+        return this._detectSeparator(line);
     }
 
-    static __detectSeparator(line) {
+    _detectSeparator(line) {
         let maxSeparator = {
             separator: constants.potentialSeparators[0],
             value: 0
         };
-      
-        constants.potentialSeparators.forEach((potentialSeparator) => {  
+
+        constants.potentialSeparators.forEach((potentialSeparator) => {
             let count = 0;
-      
-            for (let i = 0; i < line.length; i++) {
+
+            for (let i = 0; i < line.length; i += 1) {
                 if (line[i] === potentialSeparator && line[i - 1] !== potentialSeparator) {
-                    count++;
+                    count += 1;
                 }
             }
-      
+
             if (count > maxSeparator.value) {
                 maxSeparator = {
                     separator: potentialSeparator,
@@ -38,16 +38,17 @@ class SeparatorDetector {
                 };
             }
         });
-      
+
         return maxSeparator.separator;
     }
 
-    static getNextLineSeparator(line) {
-        if (~line.toString().indexOf('\r')) {
+    getNextLineSeparator(line) {
+        if (line.toString()
+            .indexOf('\r') !== -1) {
             return '\r';
-        } else {
-            return '\n';
         }
+
+        return '\n';
     }
 }
 
